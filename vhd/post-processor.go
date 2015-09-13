@@ -20,11 +20,15 @@ var providers = map[string]Provider{
 	qemu.BuilderId:       new(QEMUProvider),
 }
 
+// Config contains the post-processor configuration.
 type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 
-	OutputPath        string `mapstructure:"output"`
-	KeepInputArtifact bool   `mapstructure:"keep_input_artifict"`
+	// Where the VHD will be output to.
+	OutputPath string `mapstructure:"output"`
+
+	// Whether to keep the Provider artifact (e.g., VirtualBox VMDK).
+	KeepInputArtifact bool `mapstructure:"keep_input_artifict"`
 
 	ctx interpolate.Context
 }
@@ -64,7 +68,7 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 	}
 
 	ui.Say(fmt.Sprintf("Converted VHD: %s", p.config.OutputPath))
-	artifact = NewArtifact(p.config.OutputPath)
+	artifact = NewArtifact(provider.String(), p.config.OutputPath)
 	keep := p.config.KeepInputArtifact
 
 	return artifact, keep, nil
@@ -74,7 +78,6 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 func providerForBuilderId(builderId string) (Provider, error) {
 	if provider, ok := providers[builderId]; ok {
 		return provider, nil
-	} else {
-		return nil, fmt.Errorf("Unknown artifact type: %s", builderId)
 	}
+	return nil, fmt.Errorf("Unknown artifact type: %s", builderId)
 }

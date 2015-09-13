@@ -56,16 +56,16 @@ func (p *VirtualBoxProvider) Convert(ui packer.Ui, artifact packer.Artifact, out
 
 // Find the VMDK contained inside the VirtualBox artifact.
 func findVMDK(files ...string) (string, error) {
-	file_matches := []string{}
+	fileMatches := []string{}
 	for _, path := range files {
 		if filepath.Ext(path) == ".vmdk" {
-			file_matches = append(file_matches, path)
+			fileMatches = append(fileMatches, path)
 		}
 	}
 
-	switch len(file_matches) {
+	switch len(fileMatches) {
 	case 1:
-		return file_matches[0], nil
+		return fileMatches[0], nil
 	case 0:
 		return "", errors.New("cannot find VMDK in VirtualBox artifact")
 	default:

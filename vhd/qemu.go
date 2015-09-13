@@ -71,16 +71,16 @@ func newQEMUDriver() (qemu.Driver, error) {
 
 // Find the image contained inside the QEMU artifact.
 func findImage(files ...string) (string, error) {
-	file_matches := []string{}
+	fileMatches := []string{}
 	for _, path := range files {
 		if filepath.Ext(path) == ".qcow2" || filepath.Ext(path) == ".raw" {
-			file_matches = append(file_matches, path)
+			fileMatches = append(fileMatches, path)
 		}
 	}
 
-	switch len(file_matches) {
+	switch len(fileMatches) {
 	case 1:
-		return file_matches[0], nil
+		return fileMatches[0], nil
 	case 0:
 		return "", errors.New("cannot find image in QEMU artifact")
 	default:
