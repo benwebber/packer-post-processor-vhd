@@ -36,12 +36,11 @@ Add a post-processor declaration to your Packer template:
 
 ## Installation
 
-1. [Install Packer.](https://packer.io/docs/installation.html).
+1. [Install Packer](https://packer.io/docs/installation.html).
 
 1. Install the [Go toolchain](https://golang.org/doc/install), then install the package:
 
     ```
-    go get github/mitchellh/packer
     go get github.com/benwebber/packer-post-processor-vhd
     go install github.com/benwebber/packer-post-processor-vhd
     ```
@@ -53,8 +52,8 @@ Add a post-processor declaration to your Packer template:
         ```
         cp $GOPATH/bin/packer-post-processor-vhd ~/packer.d/plugins
         ```
-    * Windows: `%APPDATA%/packer.d/plugins`
+    * Windows:
 
         ```
-        cp %GOPATH%/bin/packer-post-processor-vhd %APPDATA%/packer.d/plugins
+        Copy-Item %GOPATH%\bin\packer-post-processor-vhd %APPDATA%\packer.d\plugins
         ```
