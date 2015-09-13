@@ -3,10 +3,7 @@
 package vhd
 
 import (
-	"errors"
 	"fmt"
-	"path/filepath"
-	"strings"
 
 	vboxcommon "github.com/mitchellh/packer/builder/virtualbox/common"
 	"github.com/mitchellh/packer/common"
@@ -14,6 +11,10 @@ import (
 	"github.com/mitchellh/packer/packer"
 	"github.com/mitchellh/packer/template/interpolate"
 )
+
+var providers = map[string]Provider{
+	vboxcommon.BuilderId: new(VirtualBoxProvider),
+}
 
 type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
@@ -43,66 +44,29 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 
 // PostProcess wraps VBoxManage to convert a VirtualBox VMDK to VHD file.
 func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (packer.Artifact, bool, error) {
-	// Abort if the input artifact was not produced by the VirtualBox builder.
-	switch artifact.BuilderId() {
-	case vboxcommon.BuilderId:
-		break
-	default:
-		err := fmt.Errorf("Unknown artifact type: %s\nCan only convert VirtualBox builder artifacts.", artifact.BuilderId())
+	provider, err := providerForBuilderId(artifact.BuilderId())
+	if err != nil {
 		return nil, false, err
 	}
 
 	ui.Say(fmt.Sprintf("Converting '%s' image to VHD file...", artifact.BuilderId()))
 
-	// Find VirtualBox VMDK.
-	vmdk, err := findVMDK(artifact.Files()...)
+	err = provider.Convert(ui, artifact, p.config.OutputPath)
 	if err != nil {
 		return nil, false, err
-	}
-	ui.Message(fmt.Sprintf("Found VirtualBox VMDK: %s", vmdk))
-
-	// Create VHD using VBoxManage.
-	artifact = NewArtifact(p.config.OutputPath)
-	keep := p.config.KeepInputArtifact
-
-	driver, err := vboxcommon.NewDriver()
-	if err != nil {
-		return nil, false, err
-	}
-
-	ui.Message("Cloning VMDK as VHD...")
-
-	command := []string{
-		"clonehd",
-		"--format", "VHD",
-		vmdk,
-		p.config.OutputPath,
-	}
-	ui.Message(fmt.Sprintf("Executing: %s", strings.Join(command, " ")))
-	if err = driver.VBoxManage(command...); err != nil {
-		return nil, keep, fmt.Errorf("Error creating VHD: %s", err)
 	}
 
 	ui.Say(fmt.Sprintf("Converted VHD: %s", p.config.OutputPath))
+	artifact = NewArtifact(p.config.OutputPath)
+	keep := p.config.KeepInputArtifact
 
 	return artifact, keep, nil
 }
 
-// Find the VMDK contained inside the VirtualBox artifact.
-func findVMDK(files ...string) (string, error) {
-	file_matches := []string{}
-	for _, path := range files {
-		if filepath.Ext(path) == ".vmdk" {
-			file_matches = append(file_matches, path)
-		}
-	}
-
-	switch len(file_matches) {
-	case 1:
-		return file_matches[0], nil
-	case 0:
-		return "", errors.New("cannot find VMDK in VirtualBox artifact")
-	default:
-		return "", errors.New("found multiple VMDKs in VirtualBox artifact")
+func providerForBuilderId(builderId string) (Provider, error) {
+	if provider, ok := providers[builderId]; ok {
+		return provider, nil
+	} else {
+		return nil, fmt.Errorf("Unknown artifact type: %s", builderId)
 	}
 }
