@@ -17,7 +17,20 @@ func (p *VirtualBoxProvider) String() string {
 	return "VirtualBox"
 }
 
-// Convert wraps VBoxManage to clone a VMDK as a VHD.
+// Execute wraps VBoxManage to run a VirtualBox command.
+func (p *VirtualBoxProvider) Execute(ui packer.Ui, command ...string) error {
+	driver, err := vboxcommon.NewDriver()
+	if err != nil {
+		return err
+	}
+	ui.Message(fmt.Sprintf("Executing: %s", strings.Join(command, " ")))
+	if err = driver.VBoxManage(command...); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert a VirtualBox VMDK artifact to a VHD file.
 func (p *VirtualBoxProvider) Convert(ui packer.Ui, artifact packer.Artifact, outputPath string) error {
 	// Find VirtualBox VMDK.
 	vmdk, err := findVMDK(artifact.Files()...)
@@ -28,18 +41,13 @@ func (p *VirtualBoxProvider) Convert(ui packer.Ui, artifact packer.Artifact, out
 
 	// Convert VMDK to VHD.
 	ui.Message("Cloning VMDK as VHD...")
-	driver, err := vboxcommon.NewDriver()
-	if err != nil {
-		return err
-	}
 	command := []string{
 		"clonehd",
 		"--format", "VHD",
 		vmdk,
 		outputPath,
 	}
-	ui.Message(fmt.Sprintf("Executing: %s", strings.Join(command, " ")))
-	if err = driver.VBoxManage(command...); err != nil {
+	if err = p.Execute(ui, command...); err != nil {
 		return fmt.Errorf("Error creating VHD: %s", err)
 	}
 

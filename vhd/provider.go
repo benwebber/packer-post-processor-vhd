@@ -5,6 +5,9 @@ import "github.com/mitchellh/packer/packer"
 // A Provider wraps logic necessary to convert specific builder artifacts to
 // VHD.
 type Provider interface {
+	// Execute runs a command using the Provider's Driver.
+	Execute(ui packer.Ui, command ...string) error
+
 	// Convert converts a builder artifact into a VHD located at outputPath.
 	Convert(ui packer.Ui, artifact packer.Artifact, outputPath string) error
 

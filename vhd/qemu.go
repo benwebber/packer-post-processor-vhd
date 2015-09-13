@@ -18,7 +18,20 @@ func (p *QEMUProvider) String() string {
 	return "QEMU"
 }
 
-// Convert wraps qemu-img to convert QEMU raw/qcow2 images to VHD files.
+// Execute wraps qemu-img to run a QEMU command.
+func (p *QEMUProvider) Execute(ui packer.Ui, command ...string) error {
+	driver, err := newQEMUDriver()
+	if err != nil {
+		return err
+	}
+	ui.Message(fmt.Sprintf("Executing: %s", strings.Join(command, " ")))
+	if err = driver.QemuImg(command...); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert a QEMU raw/qcow2 artifact to a VHD file.
 func (p *QEMUProvider) Convert(ui packer.Ui, artifact packer.Artifact, outputPath string) error {
 	// Find QEMU image.
 	img, err := findImage(artifact.Files()...)
@@ -29,15 +42,13 @@ func (p *QEMUProvider) Convert(ui packer.Ui, artifact packer.Artifact, outputPat
 
 	// Convert image to VHD.
 	ui.Message("Converting image to VHD...")
-	driver, err := newQEMUDriver()
 	command := []string{
 		"convert",
 		"-O", "vpc",
 		img,
 		outputPath,
 	}
-	ui.Message(fmt.Sprintf("Executing: %s", strings.Join(command, " ")))
-	if err = driver.QemuImg(command...); err != nil {
+	if err = p.Execute(ui, command...); err != nil {
 		return fmt.Errorf("Error creating VHD: %s", err)
 	}
 
