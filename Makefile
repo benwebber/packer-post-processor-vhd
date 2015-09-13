@@ -5,11 +5,14 @@ VERSION = 0.1.0
 
 all: build
 
-clean:
-	$(RM) $(PROJECT)
-
-build:
+build: clean
 	go build .
+
+clean:
+	go clean -x
 
 release:
 	git push origin --tags
+
+test:
+	go test -v ./...
