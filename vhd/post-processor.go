@@ -4,6 +4,7 @@ package vhd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/mitchellh/packer/builder/qemu"
 	vboxcommon "github.com/mitchellh/packer/builder/virtualbox/common"
@@ -61,6 +62,19 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 	}
 
 	ui.Say(fmt.Sprintf("Converting %s image to VHD file...", provider))
+
+	// Check if VHD file exists. Remove if the user specified `--force`.
+	// This differs from the Vagrant post-processor because the the VHD can be
+	// used (and written to) immediately. It is comparable to a Builder
+	// end-product.
+	if _, err = os.Stat(p.config.OutputPath); err == nil {
+		if p.config.PackerForce {
+			ui.Message(fmt.Sprintf("Removing existing VHD file at %s", p.config.OutputPath))
+			os.Remove(p.config.OutputPath)
+		} else {
+			return nil, false, fmt.Errorf("VHD file exists: %s\nUse the force flag to delete it.", p.config.OutputPath)
+		}
+	}
 
 	err = provider.Convert(ui, artifact, p.config.OutputPath)
 	if err != nil {
