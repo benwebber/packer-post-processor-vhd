@@ -49,7 +49,7 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 		return nil, false, err
 	}
 
-	ui.Say(fmt.Sprintf("Converting '%s' image to VHD file...", artifact.BuilderId()))
+	ui.Say(fmt.Sprintf("Converting %s image to VHD file...", provider))
 
 	err = provider.Convert(ui, artifact, p.config.OutputPath)
 	if err != nil {

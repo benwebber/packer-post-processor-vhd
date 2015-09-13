@@ -12,6 +12,10 @@ import (
 
 type VirtualBoxProvider struct{}
 
+func (p *VirtualBoxProvider) String() string {
+	return "VirtualBox"
+}
+
 // Create VHD using VBoxManage.
 func (p *VirtualBoxProvider) Convert(ui packer.Ui, artifact packer.Artifact, outputPath string) error {
 	// Find VirtualBox VMDK.
