@@ -10,13 +10,14 @@ import (
 	"github.com/mitchellh/packer/packer"
 )
 
+// VirtualBoxProvider satisfies the Provider interface.
 type VirtualBoxProvider struct{}
 
 func (p *VirtualBoxProvider) String() string {
 	return "VirtualBox"
 }
 
-// Create VHD using VBoxManage.
+// Convert wraps VBoxManage to clone a VMDK as a VHD.
 func (p *VirtualBoxProvider) Convert(ui packer.Ui, artifact packer.Artifact, outputPath string) error {
 	// Find VirtualBox VMDK.
 	vmdk, err := findVMDK(artifact.Files()...)

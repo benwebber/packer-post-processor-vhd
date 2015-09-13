@@ -11,13 +11,14 @@ import (
 	"github.com/mitchellh/packer/packer"
 )
 
+// QEMUProvider satisfies the Provider interface.
 type QEMUProvider struct{}
 
 func (p *QEMUProvider) String() string {
 	return "QEMU"
 }
 
-// PostProcess wraps qemu-img to convert QEMU raw/qcow2 images to VHD files.
+// Convert wraps qemu-img to convert QEMU raw/qcow2 images to VHD files.
 func (p *QEMUProvider) Convert(ui packer.Ui, artifact packer.Artifact, outputPath string) error {
 	// Find QEMU image.
 	img, err := findImage(artifact.Files()...)
@@ -28,7 +29,7 @@ func (p *QEMUProvider) Convert(ui packer.Ui, artifact packer.Artifact, outputPat
 
 	// Convert image to VHD.
 	ui.Message("Converting image to VHD...")
-	driver, err := newDriver()
+	driver, err := newQEMUDriver()
 	command := []string{
 		"convert",
 		"-O", "vpc",
@@ -43,7 +44,10 @@ func (p *QEMUProvider) Convert(ui packer.Ui, artifact packer.Artifact, outputPat
 	return nil
 }
 
-func newDriver() (qemu.Driver, error) {
+// newQEMUDriver creates a new QEMU command-line tool "driver". This snippet
+// is extracted from Packer because the qemu package does not export its
+// constructor.
+func newQEMUDriver() (qemu.Driver, error) {
 	qemuImgPath, err := exec.LookPath("qemu-img")
 	if err != nil {
 		return nil, fmt.Errorf("Failed creating Qemu driver: %s", err)

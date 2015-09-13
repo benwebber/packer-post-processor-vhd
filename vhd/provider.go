@@ -2,10 +2,13 @@ package vhd
 
 import "github.com/mitchellh/packer/packer"
 
+// A Provider wraps logic necessary to convert specific builder artifacts to
+// VHD.
 type Provider interface {
-	// Convert converts an artifact into a VHD. The path to the VHD is the
-	// third string argument.
-	Convert(packer.Ui, packer.Artifact, string) error
+	// Convert converts a builder artifact into a VHD located at outputPath.
+	Convert(ui packer.Ui, artifact packer.Artifact, outputPath string) error
 
+	// String satisfies the Stringer interface and will be used in log
+	// messages.
 	String() string
 }
