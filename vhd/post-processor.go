@@ -5,6 +5,7 @@ package vhd
 import (
 	"fmt"
 
+	"github.com/mitchellh/packer/builder/qemu"
 	vboxcommon "github.com/mitchellh/packer/builder/virtualbox/common"
 	"github.com/mitchellh/packer/common"
 	"github.com/mitchellh/packer/helper/config"
@@ -14,6 +15,7 @@ import (
 
 var providers = map[string]Provider{
 	vboxcommon.BuilderId: new(VirtualBoxProvider),
+	qemu.BuilderId:       new(QEMUProvider),
 }
 
 type Config struct {
@@ -42,7 +44,6 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 	return nil
 }
 
-// PostProcess wraps VBoxManage to convert a VirtualBox VMDK to VHD file.
 func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (packer.Artifact, bool, error) {
 	provider, err := providerForBuilderId(artifact.BuilderId())
 	if err != nil {
