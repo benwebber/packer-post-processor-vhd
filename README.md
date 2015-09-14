@@ -56,7 +56,7 @@ Add a post-processor declaration to your Packer template:
 
 * `force` (boolean)
 
-    Whether to overwrite a pre-existing VHD file at `output` if it exists. Defaults to `false`.
+    Whether to overwrite a pre-existing VHD file at `output` if it exists. Specifying `--force` on the command line has the same effect. Defaults to `false`.
 
 * `keep_input_artifact` (boolean)
 
