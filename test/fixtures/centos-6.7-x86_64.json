@@ -41,6 +41,7 @@
   "post-processors": [
     {
       "type": "vhd",
+      "keep_input_artifact": true,
       "force": true
     }
   ]
