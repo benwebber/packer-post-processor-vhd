@@ -38,11 +38,13 @@
       "guest_additions_mode": "disable"
     }
   ],
-  "post-processors": [
+  "provisioners": [
     {
-      "type": "vhd",
-      "keep_input_artifact": true,
-      "force": true
+      "type": "shell",
+      "execute_command": "echo 'packer' | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+      "scripts": [
+        "fixtures/scripts/networking.sh"
+      ]
     }
   ]
 }

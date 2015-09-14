@@ -1,0 +1,22 @@
+{
+  "builders": [
+    {
+      "type": "virtualbox-ovf",
+      "source_path": "output-virtualbox-iso/packer-centos-6.7-x86_64.ovf",
+      "headless": true,
+      "ssh_username": "packer",
+      "ssh_password": "packer",
+      "ssh_wait_timeout": "600s",
+      "shutdown_command": "echo 'packer' | sudo -S shutdown -P now",
+      "guest_additions_mode": "disable",
+      "vm_name": "packer-centos-6.7-x86_64"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vhd",
+      "keep_input_artifact": true,
+      "force": true
+    }
+  ]
+}

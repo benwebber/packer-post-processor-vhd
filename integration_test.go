@@ -12,7 +12,7 @@ var artifacts = []struct {
 	in  string
 	out string
 }{
-	{"fixtures/centos-6.7-x86_64.json", "packer_virtualbox-iso_virtualbox.vhd"},
+	{"fixtures/virtualbox-ovf.json", "packer_virtualbox-ovf_virtualbox.vhd"},
 }
 
 func TestIntegration(t *testing.T) {
@@ -20,7 +20,7 @@ func TestIntegration(t *testing.T) {
 		t.Error(err)
 	}
 	for _, tt := range artifacts {
-		cmd := exec.Command("packer", "build", tt.in)
+		cmd := exec.Command("packer", "build", "--force", tt.in)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
