@@ -1,1 +1,6 @@
 packer-post-processor-vhd
+
+test/build
+test/iso
+test/output*
+test/packer_cache
