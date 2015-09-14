@@ -24,6 +24,8 @@ help:
 
 clean:
 	go clean -x
+	$(RM) -r test/output*
+	$(RM) test/build/*
 
 lint:
 	golint ./...
