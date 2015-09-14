@@ -25,7 +25,7 @@ help:
 clean:
 	go clean -x
 	$(RM) -r test/output*
-	$(RM) test/build/*
+	$(RM) test/*.vhd
 
 lint:
 	golint ./...
