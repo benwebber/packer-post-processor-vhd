@@ -12,7 +12,7 @@ var artifacts = []struct {
 	in  string
 	out string
 }{
-	{"fixtures/centos-6.7-x86_64.json", "build/centos-6.7-x86_64.vhd"},
+	{"fixtures/centos-6.7-x86_64.json", "packer_virtualbox-iso_virtualbox.vhd"},
 }
 
 func TestIntegration(t *testing.T) {
