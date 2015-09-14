@@ -9,7 +9,7 @@
         testall
 
 PROJECT = packer-post-processor-vhd
-VERSION = 0.2.0
+VERSION = 0.2.1
 
 all: $(PROJECT)
 
