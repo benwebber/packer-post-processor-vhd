@@ -31,6 +31,9 @@ type Config struct {
 	// Whether to keep the Provider artifact (e.g., VirtualBox VMDK).
 	KeepInputArtifact bool `mapstructure:"keep_input_artifict"`
 
+	// Whether to overwrite the VHD if it exists.
+	Force bool `mapstructure:"force"`
+
 	ctx interpolate.Context
 }
 
@@ -63,12 +66,13 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 
 	ui.Say(fmt.Sprintf("Converting %s image to VHD file...", provider))
 
-	// Check if VHD file exists. Remove if the user specified `--force`.
+	// Check if VHD file exists. Remove if the user specified `force` in the
+	// template or `--force` on the command-line.
 	// This differs from the Vagrant post-processor because the the VHD can be
 	// used (and written to) immediately. It is comparable to a Builder
 	// end-product.
 	if _, err = os.Stat(p.config.OutputPath); err == nil {
-		if p.config.PackerForce {
+		if p.config.PackerForce || p.config.Force {
 			ui.Message(fmt.Sprintf("Removing existing VHD file at %s", p.config.OutputPath))
 			os.Remove(p.config.OutputPath)
 		} else {

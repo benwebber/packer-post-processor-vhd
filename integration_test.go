@@ -20,7 +20,7 @@ func TestIntegration(t *testing.T) {
 		t.Error(err)
 	}
 	for _, tt := range artifacts {
-		cmd := exec.Command("packer", "build", "--force", tt.in)
+		cmd := exec.Command("packer", "build", tt.in)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()

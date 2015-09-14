@@ -41,7 +41,8 @@
   "post-processors": [
     {
       "type": "vhd",
-      "output": "build/centos-6.7-x86_64.vhd"
+      "output": "build/centos-6.7-x86_64.vhd",
+      "force": true
     }
   ]
 }
