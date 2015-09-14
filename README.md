@@ -28,11 +28,40 @@ Add a post-processor declaration to your Packer template:
     {
       "type": "vhd",
       "only": ["virtualbox-iso"],
-      "output": "builds/centos-6.7-x86_64.vhd"
     }
   ]
 }
 ```
+
+## Configuration
+
+**packer-post-processor-vhd** supports the following optional configuration items:
+
+* `output` (string)
+
+    The path to the VHD file. This is a [configuration template](https://www.packer.io/docs/templates/configuration-templates.html). The template supports the following variables:
+
+    * `{{ .BuildName }}`
+
+        Replaced by the name of the builder (e.g., `virtualbox-iso` or a custom `name`).
+
+    * `{{ .Provider }}`
+
+        Replaced by the input artifact provider (e.g., `virtualbox`).
+
+    * `{{ .ArtifactId }}`
+
+        Replaced by the ID of the input artifact.
+
+    Defaults to `packer_{{ .BuildName }}_{{ .Provider }}.vhd`.
+
+* `force` (boolean)
+
+    Whether to overwrite a pre-existing VHD file at `output` if it exists. Defaults to `false`.
+
+* `keep_input_artifact` (boolean)
+
+    Whether to keep the input artifact (e.g., VirtualBox image) after processing. Defaults to `false`.
 
 ## Installation
 

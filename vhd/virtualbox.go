@@ -11,10 +11,20 @@ import (
 )
 
 // VirtualBoxProvider satisfies the Provider interface.
-type VirtualBoxProvider struct{}
+type VirtualBoxProvider struct {
+	name string
+}
+
+func NewVirtualBoxProvider() *VirtualBoxProvider {
+	return &VirtualBoxProvider{"VirtualBox"}
+}
 
 func (p *VirtualBoxProvider) String() string {
-	return "VirtualBox"
+	return p.name
+}
+
+func (p *VirtualBoxProvider) Name() string {
+	return strings.ToLower(p.name)
 }
 
 // Execute wraps VBoxManage to run a VirtualBox command.

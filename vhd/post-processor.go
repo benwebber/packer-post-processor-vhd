@@ -17,8 +17,8 @@ import (
 // Map Builders to Providers: these are the types of artifacts we know how to
 // convert.
 var providers = map[string]Provider{
-	vboxcommon.BuilderId: new(VirtualBoxProvider),
-	qemu.BuilderId:       new(QEMUProvider),
+	vboxcommon.BuilderId: NewVirtualBoxProvider(),
+	qemu.BuilderId:       NewQEMUProvider(),
 }
 
 // Config contains the post-processor configuration.
@@ -42,6 +42,14 @@ type PostProcessor struct {
 	config Config
 }
 
+// outputPathTemplate contains fields available to template the VHD output
+// path.
+type outputPathTemplate struct {
+	ArtifactId string
+	BuildName  string
+	Provider   string
+}
+
 // Configure the PostProcessor, rendering templated values if necessary.
 func (p *PostProcessor) Configure(raws ...interface{}) error {
 	err := config.Decode(&p.config, &config.DecodeOpts{
@@ -53,6 +61,11 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	if p.config.OutputPath == "" {
+		p.config.OutputPath = "packer_{{ .BuildName }}_{{ .Provider }}.vhd"
+	}
+
 	return nil
 }
 
@@ -66,27 +79,38 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 
 	ui.Say(fmt.Sprintf("Converting %s image to VHD file...", provider))
 
+	// Render output path.
+	p.config.ctx.Data = &outputPathTemplate{
+		ArtifactId: artifact.Id(),
+		BuildName:  p.config.PackerBuildName,
+		Provider:   provider.Name(),
+	}
+	outputPath, err := interpolate.Render(p.config.OutputPath, &p.config.ctx)
+	if err != nil {
+		return nil, false, err
+	}
+
 	// Check if VHD file exists. Remove if the user specified `force` in the
 	// template or `--force` on the command-line.
 	// This differs from the Vagrant post-processor because the the VHD can be
 	// used (and written to) immediately. It is comparable to a Builder
 	// end-product.
-	if _, err = os.Stat(p.config.OutputPath); err == nil {
+	if _, err = os.Stat(outputPath); err == nil {
 		if p.config.PackerForce || p.config.Force {
-			ui.Message(fmt.Sprintf("Removing existing VHD file at %s", p.config.OutputPath))
-			os.Remove(p.config.OutputPath)
+			ui.Message(fmt.Sprintf("Removing existing VHD file at %s", outputPath))
+			os.Remove(outputPath)
 		} else {
-			return nil, false, fmt.Errorf("VHD file exists: %s\nUse the force flag to delete it.", p.config.OutputPath)
+			return nil, false, fmt.Errorf("VHD file exists: %s\nUse the force flag to delete it.", outputPath)
 		}
 	}
 
-	err = provider.Convert(ui, artifact, p.config.OutputPath)
+	err = provider.Convert(ui, artifact, outputPath)
 	if err != nil {
 		return nil, false, err
 	}
 
-	ui.Say(fmt.Sprintf("Converted VHD: %s", p.config.OutputPath))
-	artifact = NewArtifact(provider.String(), p.config.OutputPath)
+	ui.Say(fmt.Sprintf("Converted VHD: %s", outputPath))
+	artifact = NewArtifact(provider.String(), outputPath)
 	keep := p.config.KeepInputArtifact
 
 	return artifact, keep, nil

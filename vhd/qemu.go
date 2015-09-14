@@ -12,10 +12,20 @@ import (
 )
 
 // QEMUProvider satisfies the Provider interface.
-type QEMUProvider struct{}
+type QEMUProvider struct {
+	name string
+}
+
+func NewQEMUProvider() *QEMUProvider {
+	return &QEMUProvider{"QEMU"}
+}
 
 func (p *QEMUProvider) String() string {
-	return "QEMU"
+	return p.name
+}
+
+func (p *QEMUProvider) Name() string {
+	return strings.ToLower(p.name)
 }
 
 // Execute wraps qemu-img to run a QEMU command.

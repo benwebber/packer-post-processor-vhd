@@ -5,6 +5,9 @@ import "github.com/mitchellh/packer/packer"
 // A Provider wraps logic necessary to convert specific builder artifacts to
 // VHD.
 type Provider interface {
+	// Name should return a simple lowercase identifier for the provider.
+	Name() string
+
 	// Execute runs a command using the Provider's Driver.
 	Execute(ui packer.Ui, command ...string) error
 
