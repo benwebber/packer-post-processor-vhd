@@ -9,14 +9,13 @@ VHD files can be used with the following hypervisors:
 * VirtualBox
 * XenServer
 
+**packer-post-processor-vhd** supports converting [VirtualBox](https://www.packer.io/docs/builders/virtualbox.html) and [QEMU](https://www.packer.io/docs/builders/qemu.html) images to VHDs. It can be used as a post-processor for artifacts from both builders.
+
 ## Dependencies
 
 * Packer 0.7+
-* VirtualBox (`VBoxManage`)
-
-## Limitations
-
-**packer-post-processor-vhd** currently only supports converting VirtualBox images to VHDs. It can be used as a post-processor for VirtualBox builder artifacts.
+* VirtualBox (`VBoxManage`) is required to convert VirtualBox artifacts.
+* QEMU (`qemu-img`) is required to convert QEMU artifacts.
 
 ## Usage
 
