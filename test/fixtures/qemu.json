@@ -1,0 +1,40 @@
+{
+  "variables": {
+    "PACKER_BOX_NAME": "packer-centos-6.7-x86_64"
+  },
+  "builders": [
+    {
+      "type": "qemu",
+      "iso_urls": [
+        "iso/CentOS-6.7-x86_64-minimal.iso",
+        "http://mirror.csclub.uwaterloo.ca/centos/6.7/isos/x86_64/CentOS-6.7-x86_64-minimal.iso"
+      ],
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 8192,
+      "headless": true,
+      "http_directory": "fixtures/http",
+      "iso_checksum_type": "sha256",
+      "iso_checksum": "9d3fec5897be6b3fed4d3dda80b8fa7bb62c616bbfd4bdcd27295ca9b764f498",
+      "ssh_username": "packer",
+      "ssh_password": "packer",
+      "ssh_wait_timeout": "600s",
+      "shutdown_command": "echo 'packer' | sudo -S /sbin/halt -h -p",
+      "vm_name": "{{ user `PACKER_BOX_NAME` }}",
+      "qemuargs": [
+        ["-drive", "file=output-qemu/{{ user `PACKER_BOX_NAME` }},if=virtio,cache=writeback"]
+      ],
+      "qemu_binary": "/usr/libexec/qemu-kvm",
+      "net_device": "e1000"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vhd",
+      "keep_input_artifact": true,
+      "force": true
+    }
+  ]
+}
