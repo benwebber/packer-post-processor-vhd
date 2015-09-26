@@ -64,7 +64,27 @@ Add a post-processor declaration to your Packer template:
 
 ## Installation
 
-1. [Install Packer](https://packer.io/docs/installation.html).
+### Linux, Mac OS X, and Windows
+
+1. Download the [latest release](https://github.com/benwebber/packer-post-processor-vhd/releases).
+
+2. Rename the plugin `packer-post-processer-vhd`.
+
+3. Copy the binary to your [Packer plugins directory](https://www.packer.io/docs/extend/plugins.html).
+
+    * Linux and Mac OS X:
+
+        ```
+        ~/packer.d/plugins
+        ```
+    * Windows:
+
+        ```
+        %APPDATA%\packer.d\plugins
+        ```
+
+### Other Platforms
+
 
 1. Install the [Go toolchain](https://golang.org/doc/install), then install the package:
 

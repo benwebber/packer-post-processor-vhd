@@ -20,11 +20,12 @@ help:
 	@echo "clean     remove testing artifacts"
 	@echo "cleanall  remove development and testing artifacts"
 	@echo "dev       set up development environment"
+	@echo "dist      cross-compile binaries for distribution"
 	@echo "help      show this page"
 	@echo "lint      check style with golint"
 	@echo "test      run unit tests"
 	@echo "testall   run integration tests"
-	@echo "release   push tags upstream"
+	@echo "release   push tags and binaries upstream"
 
 clean:
 	go clean -x
@@ -37,11 +38,15 @@ cleanall: clean
 dev:
 	cd test && packer build --force fixtures/virtualbox-iso.json
 
+dist:
+	gox --osarch="linux/amd64 darwin/amd64 windows/amd64" --output "dist/$(PROJECT)-$(VERSION)-{{ .OS }}_{{ .Arch }}"
+
 lint:
 	golint ./...
 
-release:
+release: dist
 	git push origin --tags
+	scripts/release.sh $(PROJECT) $(VERSION)
 
 test:
 	go test -v ./...

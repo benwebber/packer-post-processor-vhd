@@ -1,5 +1,7 @@
 packer-post-processor-vhd
 
+dist/
+
 test/**/*.vhd
 test/iso
 test/output*
