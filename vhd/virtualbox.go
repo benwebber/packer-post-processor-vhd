@@ -8,6 +8,7 @@ import (
 
 	vboxcommon "github.com/mitchellh/packer/builder/virtualbox/common"
 	"github.com/mitchellh/packer/packer"
+	"github.com/mitchellh/packer/post-processor/vagrant"
 )
 
 // VirtualBoxProvider satisfies the Provider interface.
@@ -41,9 +42,31 @@ func (p *VirtualBoxProvider) Execute(ui packer.Ui, command ...string) error {
 }
 
 // Convert a VirtualBox VMDK artifact to a VHD file.
-func (p *VirtualBoxProvider) Convert(ui packer.Ui, artifact packer.Artifact, outputPath string) error {
+func (p *VirtualBoxProvider) Convert(ui packer.Ui, artifact packer.Artifact, outputPath string) (err error) {
+	var files []string
+	// Unpack the VirtualBox artifact if necessary (if in the OVA format).
+	for _, path := range artifact.Files() {
+		if ext := filepath.Ext(path); ext == ".ova" {
+			// Extract OVA files in place.
+			ui.Message(fmt.Sprintf("Unpacking OVA: %s", path))
+			dir := filepath.Dir(path)
+			if err = vagrant.DecompressOva(dir, path); err != nil {
+				return err
+			}
+			// Prepare new slice of files to search.
+			glob := filepath.Join(dir, "*")
+			files, err = filepath.Glob(glob)
+			if err != nil {
+				return err
+			}
+			continue
+		} else {
+			files = artifact.Files()
+		}
+	}
+
 	// Find VirtualBox VMDK.
-	vmdk, err := findVMDK(artifact.Files()...)
+	vmdk, err := findVMDK(files...)
 	if err != nil {
 		return err
 	}

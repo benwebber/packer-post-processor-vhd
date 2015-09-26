@@ -28,7 +28,7 @@ help:
 
 clean:
 	go clean -x
-	$(RM) -r test/output-virtualbox-ovf
+	$(RM) -r test/output-virtualbox-iso-o*
 	$(RM) test/*.vhd
 
 cleanall: clean

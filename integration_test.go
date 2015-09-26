@@ -13,6 +13,7 @@ var artifacts = []struct {
 	out string
 }{
 	{"fixtures/virtualbox-ovf.json", "packer_virtualbox-ovf_virtualbox.vhd"},
+	{"fixtures/virtualbox-ova.json", "packer_virtualbox-ova_virtualbox.vhd"},
 }
 
 func TestIntegration(t *testing.T) {
