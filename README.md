@@ -68,7 +68,7 @@ Add a post-processor declaration to your Packer template:
 
 1. Download the [latest release](https://github.com/benwebber/packer-post-processor-vhd/releases).
 
-2. Rename the plugin `packer-post-processer-vhd`.
+2. Rename the plugin `packer-post-processor-vhd`.
 
 3. Copy the binary to your [Packer plugins directory](https://www.packer.io/docs/extend/plugins.html).
 
