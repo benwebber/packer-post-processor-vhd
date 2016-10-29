@@ -3,6 +3,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/exec"
 	"testing"
@@ -14,6 +15,17 @@ var artifacts = []struct {
 }{
 	{"fixtures/virtualbox-ovf.json", "packer_virtualbox-ovf_virtualbox.vhd"},
 	{"fixtures/virtualbox-ova.json", "packer_virtualbox-ova_virtualbox.vhd"},
+}
+
+// Build the source artifacts.
+func init() {
+	cmd := exec.Command("packer", "build", "--force", "fixtures/virtualbox-iso.json")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func TestIntegration(t *testing.T) {
