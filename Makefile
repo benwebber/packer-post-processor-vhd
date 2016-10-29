@@ -35,7 +35,7 @@ clean:
 	$(RM) test/*.vhd
 
 cleanall: clean
-	$(RM) -r test/output-virtualbox-iso
+	find test -mindepth 1 ! -path 'test/fixtures*' -exec $(RM) -r {} \;
 
 dist:
 	gox --osarch="linux/amd64 darwin/amd64 windows/amd64" --output "dist/$(PROJECT)-$(VERSION)-{{ .OS }}_{{ .Arch }}"
