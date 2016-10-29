@@ -1,5 +1,7 @@
 # packer-post-processor-vhd
 
+[![Packer post-processor plugin](https://img.shields.io/badge/packer-post--processor-blue.svg)](https://www.packer.io/docs/basics/terminology.html#Post_processors) ![Requires Packer 0.7 or higher](https://img.shields.io/badge/packer-0.7+-blue.svg)
+
 Packer post-processor plugin to produce Virtual Hard Disk (VHD) files.
 
 VHD files can be used with the following hypervisors:
