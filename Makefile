@@ -1,4 +1,5 @@
-.PHONY: all \
+.PHONY: .depend \
+        all \
         clean \
         cleanall \
         dev \
@@ -13,8 +14,8 @@ VERSION = 0.3.0
 
 all: $(PROJECT)
 
-$(PROJECT): clean
-	go build .
+$(PROJECT): .depend clean
+	go build -v .
 
 help:
 	@echo "clean     remove testing artifacts"
@@ -26,6 +27,9 @@ help:
 	@echo "test      run unit tests"
 	@echo "testall   run integration tests"
 	@echo "release   push tags and binaries upstream"
+
+.depend:
+	go get -d github.com/mitchellh/packer
 
 clean:
 	go clean -x
