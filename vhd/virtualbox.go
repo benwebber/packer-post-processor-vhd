@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	vboxcommon "github.com/mitchellh/packer/builder/virtualbox/common"
-	"github.com/mitchellh/packer/packer"
-	"github.com/mitchellh/packer/post-processor/vagrant"
+	vboxcommon "github.com/hashicorp/packer/builder/virtualbox/common"
+	"github.com/hashicorp/packer/packer"
+	"github.com/hashicorp/packer/post-processor/vagrant"
 )
 
 // VirtualBoxProvider satisfies the Provider interface.

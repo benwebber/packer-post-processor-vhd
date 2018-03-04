@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/mitchellh/packer/builder/qemu"
-	"github.com/mitchellh/packer/packer"
+	"github.com/hashicorp/packer/builder/qemu"
+	"github.com/hashicorp/packer/packer"
 )
 
 // QEMUProvider satisfies the Provider interface.

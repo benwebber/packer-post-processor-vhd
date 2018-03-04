@@ -27,7 +27,7 @@ help:
 	@echo "release   push tags and binaries upstream"
 
 .depend:
-	go get -d github.com/mitchellh/packer
+	go get -d github.com/hashicorp/packer
 
 clean:
 	go clean -x
