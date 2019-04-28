@@ -3,6 +3,7 @@
 package vhd
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -71,10 +72,10 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 
 // PostProcess is the main entry point. It calls a Provider's Convert() method
 // to delegate conversion to that Provider's command-line tool.
-func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (packer.Artifact, bool, error) {
+func (p *PostProcessor) PostProcess(ctx context.Context, ui packer.Ui, artifact packer.Artifact) (packer.Artifact, bool, bool, error) {
 	provider, err := providerForBuilderId(artifact.BuilderId())
 	if err != nil {
-		return nil, false, err
+		return nil, false, false, err
 	}
 
 	ui.Say(fmt.Sprintf("Converting %s image to VHD file...", provider))
@@ -87,7 +88,7 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 	}
 	outputPath, err := interpolate.Render(p.config.OutputPath, &p.config.ctx)
 	if err != nil {
-		return nil, false, err
+		return nil, false, false, err
 	}
 
 	// Check if VHD file exists. Remove if the user specified `force` in the
@@ -100,20 +101,20 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 			ui.Message(fmt.Sprintf("Removing existing VHD file at %s", outputPath))
 			os.Remove(outputPath)
 		} else {
-			return nil, false, fmt.Errorf("VHD file exists: %s\nUse the force flag to delete it.", outputPath)
+			return nil, false, false, fmt.Errorf("VHD file exists: %s\nUse the force flag to delete it.", outputPath)
 		}
 	}
 
 	err = provider.Convert(ui, artifact, outputPath)
 	if err != nil {
-		return nil, false, err
+		return nil, false, false, err
 	}
 
 	ui.Say(fmt.Sprintf("Converted VHD: %s", outputPath))
 	artifact = NewArtifact(provider.String(), outputPath)
 	keep := p.config.KeepInputArtifact
 
-	return artifact, keep, nil
+	return artifact, keep, false, nil
 }
 
 // Pick a provider to use from known builder sources.
