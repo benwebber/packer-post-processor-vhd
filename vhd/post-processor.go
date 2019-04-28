@@ -30,7 +30,7 @@ type Config struct {
 	OutputPath string `mapstructure:"output"`
 
 	// Whether to keep the Provider artifact (e.g., VirtualBox VMDK).
-	KeepInputArtifact bool `mapstructure:"keep_input_artifict"`
+	KeepInputArtifact bool `mapstructure:"keep_input_artifact"`
 
 	// Whether to overwrite the VHD if it exists.
 	Force bool `mapstructure:"force"`
