@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/packer/builder/qemu"
-	"github.com/hashicorp/packer/packer"
+	"github.com/hashicorp/packer-plugin-sdk/packer"
 )
 
 // QEMUProvider satisfies the Provider interface.

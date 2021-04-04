@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	vboxcommon "github.com/hashicorp/packer/builder/virtualbox/common"
-	"github.com/hashicorp/packer/packer"
+	"github.com/hashicorp/packer-plugin-sdk/packer"
 	"github.com/hashicorp/packer/post-processor/vagrant"
 )
 

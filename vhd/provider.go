@@ -1,6 +1,6 @@
 package vhd
 
-import "github.com/hashicorp/packer/packer"
+import "github.com/hashicorp/packer-plugin-sdk/packer"
 
 // A Provider wraps logic necessary to convert specific builder artifacts to
 // VHD.

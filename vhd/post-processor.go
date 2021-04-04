@@ -1,17 +1,20 @@
+//go:generate mapstructure-to-hcl2 -type Config
 // Package vhd implements the packer.PostProcessor interface and adds a
 // post-processor that produces a standalone VHD file.
 package vhd
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/hashicorp/packer/builder/qemu"
 	vboxcommon "github.com/hashicorp/packer/builder/virtualbox/common"
-	"github.com/hashicorp/packer/common"
-	"github.com/hashicorp/packer/helper/config"
-	"github.com/hashicorp/packer/packer"
-	"github.com/hashicorp/packer/template/interpolate"
+	"github.com/hashicorp/packer-plugin-sdk/common"
+	"github.com/hashicorp/packer-plugin-sdk/template/config"
+	"github.com/hashicorp/packer-plugin-sdk/packer"
+	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
+	"github.com/hashicorp/hcl/v2/hcldec"
 )
 
 // Map Builders to Providers: these are the types of artifacts we know how to
@@ -29,7 +32,7 @@ type Config struct {
 	OutputPath string `mapstructure:"output"`
 
 	// Whether to keep the Provider artifact (e.g., VirtualBox VMDK).
-	KeepInputArtifact bool `mapstructure:"keep_input_artifict"`
+	KeepInputArtifact bool `mapstructure:"keep_input_artifact"`
 
 	// Whether to overwrite the VHD if it exists.
 	Force bool `mapstructure:"force"`
@@ -48,6 +51,10 @@ type outputPathTemplate struct {
 	ArtifactId string
 	BuildName  string
 	Provider   string
+}
+
+func (p *PostProcessor) ConfigSpec() hcldec.ObjectSpec {
+	return p.config.FlatMapstructure().HCL2Spec()
 }
 
 // Configure the PostProcessor, rendering templated values if necessary.
@@ -71,10 +78,10 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 
 // PostProcess is the main entry point. It calls a Provider's Convert() method
 // to delegate conversion to that Provider's command-line tool.
-func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (packer.Artifact, bool, error) {
+func (p *PostProcessor) PostProcess(ctx context.Context, ui packer.Ui, artifact packer.Artifact) (packer.Artifact, bool, bool, error) {
 	provider, err := providerForBuilderId(artifact.BuilderId())
 	if err != nil {
-		return nil, false, err
+		return nil, false, false, err
 	}
 
 	ui.Say(fmt.Sprintf("Converting %s image to VHD file...", provider))
@@ -87,7 +94,7 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 	}
 	outputPath, err := interpolate.Render(p.config.OutputPath, &p.config.ctx)
 	if err != nil {
-		return nil, false, err
+		return nil, false, false, err
 	}
 
 	// Check if VHD file exists. Remove if the user specified `force` in the
@@ -100,20 +107,20 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 			ui.Message(fmt.Sprintf("Removing existing VHD file at %s", outputPath))
 			os.Remove(outputPath)
 		} else {
-			return nil, false, fmt.Errorf("VHD file exists: %s\nUse the force flag to delete it.", outputPath)
+			return nil, false, false, fmt.Errorf("VHD file exists: %s\nUse the force flag to delete it.", outputPath)
 		}
 	}
 
 	err = provider.Convert(ui, artifact, outputPath)
 	if err != nil {
-		return nil, false, err
+		return nil, false, false, err
 	}
 
 	ui.Say(fmt.Sprintf("Converted VHD: %s", outputPath))
 	artifact = NewArtifact(provider.String(), outputPath)
 	keep := p.config.KeepInputArtifact
 
-	return artifact, keep, nil
+	return artifact, keep, false, nil
 }
 
 // Pick a provider to use from known builder sources.
