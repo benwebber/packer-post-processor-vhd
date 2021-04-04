@@ -1,3 +1,4 @@
+//go:generate mapstructure-to-hcl2 -type Config
 // Package vhd implements the packer.PostProcessor interface and adds a
 // post-processor that produces a standalone VHD file.
 package vhd
@@ -9,10 +10,11 @@ import (
 
 	"github.com/hashicorp/packer/builder/qemu"
 	vboxcommon "github.com/hashicorp/packer/builder/virtualbox/common"
-	"github.com/hashicorp/packer/common"
-	"github.com/hashicorp/packer/helper/config"
-	"github.com/hashicorp/packer/packer"
-	"github.com/hashicorp/packer/template/interpolate"
+	"github.com/hashicorp/packer-plugin-sdk/common"
+	"github.com/hashicorp/packer-plugin-sdk/template/config"
+	"github.com/hashicorp/packer-plugin-sdk/packer"
+	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
+	"github.com/hashicorp/hcl/v2/hcldec"
 )
 
 // Map Builders to Providers: these are the types of artifacts we know how to
@@ -49,6 +51,10 @@ type outputPathTemplate struct {
 	ArtifactId string
 	BuildName  string
 	Provider   string
+}
+
+func (p *PostProcessor) ConfigSpec() hcldec.ObjectSpec {
+	return p.config.FlatMapstructure().HCL2Spec()
 }
 
 // Configure the PostProcessor, rendering templated values if necessary.

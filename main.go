@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/benwebber/packer-post-processor-vhd/vhd"
-	"github.com/hashicorp/packer/packer/plugin"
+	"github.com/hashicorp/packer-plugin-sdk/plugin"
 )
 
 func main() {
